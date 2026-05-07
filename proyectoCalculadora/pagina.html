@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="bg-gray-100 flex items-center justify-center h-screen">
+    <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+        Calculadora Básica con PHP
+      </h2>
+
+      <form action="pagina.php" method="POST" class="space-y-4">
+        <!-- campos para introducir los números -->
+        <div class="bg-gray-200 p-4 rounded-md">
+          <label class="block text-sm font-medium text-gray-600"
+            >Número 1</label
+          >
+          <input
+            type="text"
+            name="num1"
+            required
+            class="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+
+          <label class="block text-sm font-medium text-gray-600"
+            >Número 2</label
+          >
+          <input
+            type="text"
+            name="num2"
+            required
+            class="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+        </div>
+
+        <div class="max-w-xs mx-auto mt-10">
+          <!-- botones de operaciones -->
+          <div class="flex-row justify-between flex">
+            <button
+              type="submit"
+              name="operacion"
+              value="sumar"
+              class="btn-calc"
+            >
+              +
+            </button>
+            <button
+              type="submit"
+              name="operacion"
+              value="restar"
+              class="btn-calc"
+            >
+              -
+            </button>
+            <button
+              type="submit"
+              name="operacion"
+              value="multiplicar"
+              class="btn-calc"
+            >
+              *
+            </button>
+            <button
+              type="submit"
+              name="operacion"
+              value="dividir"
+              class="btn-calc"
+            >
+              /
+            </button>
+          </div>
+          <!-- botón de resultado  -->
+          <button
+            type="submit"
+            name="calcular"
+            class="w-full mt-4 bg-blue-600 text-white py-2 rounded-md font-bold text-2xl hover:bg-blue-700 shadow-lg"
+          >
+            =
+          </button>
+          <div
+            id="resultado"
+            class="mt-4 p-4 rounded-md text-center font-bold"
+          ></div>
+        </div>
+      </form>
+    </div>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            // espacio para colres personalalizados
+          },
+        },
+      };
+
+      document.querySelectorAll(".btn-calc").forEach((boton) => {
+        boton.addEventListener("click", async (e) => {
+          e.preventDefault();
+          const formData = new FormData(document.querySelector("form"));
+          formData.append("operacion", boton.value);
+
+          const resp = await fetch("pagina.php", {
+            method: "POST",
+            body: formData,
+          });
+          const texto = await resp.text();
+
+          // Insertar el HTML visible
+          document.getElementById("resultado").innerHTML = texto;
+
+          // Extraer y ejecutar los <script> que vienen del PHP
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(texto, "text/html");
+          doc.querySelectorAll("script").forEach((script) => {
+            eval(script.textContent);
+          });
+        });
+      });
+    </script>
+
+    <style type="text/tailwindcss">
+      @layer components {
+        .btn-calc {
+          @apply w-16 bg-gray-400 text-white  text-xl py-2 rounded-md font-semibold hover:bg-gray-600 transition duration-300;
+        }
+      }
+    </style>
+  </body>
+</html>
